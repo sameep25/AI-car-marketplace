@@ -44,6 +44,7 @@ const Header = async ({ isAdminPage = false }) => {
                 </Button>
               </Link>
 
+              {/* Reservations and Admin */}
               {isAdmin ? (
                 <Link href="/admin">
                   <Button variant="outline">
@@ -60,6 +61,7 @@ const Header = async ({ isAdminPage = false }) => {
                 </Link>
               )}
 
+              {/* User button */}
               <UserButton
                 appearance={{
                   elements: {
@@ -70,6 +72,7 @@ const Header = async ({ isAdminPage = false }) => {
             </SignedIn>
           )}
 
+          {/* show login button when logout out */}
           <SignedOut>
             <SignInButton>
               <Button variant="outline">Login</Button>
