@@ -120,3 +120,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .gradient-title {
+    @apply font-extrabold tracking-tighter pr-2 pb-2 text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-green-500;
+  }
+}
+
+/* custom class for section div */
+.dotted-background {
+  background-color: #16223c;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.28) 1px,
+    transparent 1px
+  );
+  background-size: 30px 30px;
+}
+/*  custom class for section heading */
+/* bg-gradient-to-br --> gradient from top left to bottom right */
+/* @layer utilities {
+  .gradient {
+    @apply bg-gradient-to-br from-blue-500 to-green-500;
+  }
+
+  .gradient-title {
+    @apply gradient font-extrabold tracking-tighter pr-2 pb-2 text-transparent bg-clip-text;
+  }
+} */
