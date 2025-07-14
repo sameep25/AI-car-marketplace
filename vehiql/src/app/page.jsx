@@ -6,8 +6,7 @@ import { ChevronRight, Car, Calendar, Shield } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { featuredCars } from "@/lib/data";
-import { carMakes } from "@/lib/data";
+import { featuredCars, bodyTypes, carMakes } from "@/lib/data";
 import CarCard from "@/components/CarCard";
 import Link from "next/link";
 
@@ -93,10 +92,11 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why choose us */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-12">
-            Why Choose our platform
+            Why choose our platform
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -130,6 +130,49 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* browse by model */}
+      <section className="py-12 px-12 bg-blue-50">
+        {/* wrapper div */}
+        <div className="container mx-auto ">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold">Featured Models</h2>
+            <Button variant="ghost" className="flex items-center" asChild>
+              <Link href={`/cars`}>
+                View All <ChevronRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* models*/}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 ">
+          {bodyTypes.map((type) => {
+            return (
+              <Link
+                key={type.name}
+                href={`/car?bodyType=${type.name}`}
+                className="relative group cursor-pointer bg-gradient-to-t from-black/70 to transparent rounded-lg"
+              >
+                <div className="overflow-hidden rounded-lg flex justify-end h-38 mb-4 relative ">
+                  <Image
+                    src={type.image}
+                    alt={type.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-300 "
+                  />
+                </div>
+
+                <div className="absolute inset-0 rounded-lg flex items-end ">
+                  <h3 className="pl-4 pb-2 text-white font-bold ">
+                    {type.name}
+                  </h3>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>
