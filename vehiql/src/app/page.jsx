@@ -1,14 +1,21 @@
+"use client";
+
 import HomeSearch from "@/components/HomeSearch";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Car, Calendar, Shield } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { featuredCars } from "@/lib/data";
+import { carMakes } from "@/lib/data";
 import CarCard from "@/components/CarCard";
+import Link from "next/link";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
-    <div className="pt-20 flex flex-col">
+    <div className="pt-20 flex flex-col bg-blue-50">
       {/* Hero */}
       <section className="relative py-16 md:py-28 dotted-background">
         <div className="max-w-4xl mx-auto text-center">
@@ -27,22 +34,102 @@ export default function Home() {
       </section>
 
       {/* Featured Cars */}
-      <section className="py-12">
+      <section className="py-12 px-12 ">
         {/* Headings */}
-        <div>
-          <div className="flex">
-            <h2>Featured Cars</h2>
-            <Button>
-              View All <ChevronRight className="ml-1 h-4 w-4" />
+        <div className="container mx-auto ">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold">Featured Cars</h2>
+            <Button variant="ghost" className="flex items-center" asChild>
+              <Link href={`/cars`}>
+                View All <ChevronRight className="ml-1 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>
 
-        {/* Featured Cars */}
+        {/* Featured Cars Car-card*/}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredCars.map((car) => {
             return <CarCard key={car.id} car={car} />;
           })}
+        </div>
+      </section>
+
+      {/* Browse by makes */}
+      <section className="py-12 px-12 bg-blue-50">
+        {/* wrapper div */}
+        <div className="container mx-auto ">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold">Featured Cars</h2>
+            <Button variant="ghost" className="flex items-center" asChild>
+              <Link href={`/cars`}>
+                View All <ChevronRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Makes*/}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {carMakes.map((make) => {
+            return (
+              <Link
+                key={make.name}
+                href={`/car?make=${make.name}`}
+                className="bg-white rounded shadow p-4 text-center hover:shadow-md transition cursor-pointer"
+              >
+                <div className="h-16 w-auto mx-auto mb-2 relative mb-4">
+                  <Image
+                    src={make.image}
+                    alt={make.name}
+                    fill
+                    className={{ ObjectFit: "contain" }}
+                  />
+                </div>
+                {/* <h3 className="font-medium">{make.name}</h3> */}
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-12">
+            Why Choose our platform
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Car className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Wide Selection</h3>
+              <p className="text-gray-600">
+                Thousands of verified vehicles from trusted dealerships and
+                private sellers.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Calendar className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Easy Test Drive</h3>
+              <p className="text-gray-600">
+                Book a test drive online in minutes, with flexible scheduling
+                options.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Secure Process</h3>
+              <p className="text-gray-600">
+                Verified listings and secure booking process for peace of mind.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
