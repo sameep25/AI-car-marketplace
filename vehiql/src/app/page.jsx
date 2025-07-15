@@ -21,7 +21,7 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="pt-20 flex flex-col bg-blue-50">
+    <div className="pt-20 flex flex-col bg-gray-50">
       {/* Hero */}
       <section className="relative py-16 md:py-28 dotted-background">
         <div className="max-w-4xl mx-auto text-center">
@@ -62,7 +62,7 @@ export default function Home() {
       </section>
 
       {/* Browse by makes */}
-      <section className="py-12 px-12 bg-blue-50">
+      <section className="py-12 px-12 ">
         {/* wrapper div */}
         <div className="container mx-auto ">
           <div className="flex justify-between items-center mb-8">
@@ -82,7 +82,7 @@ export default function Home() {
               <Link
                 key={make.name}
                 href={`/car?make=${make.name}`}
-                className="bg-white rounded shadow p-4 text-center hover:shadow-md transition cursor-pointer"
+                className="bg-white rounded-md shadow-xl p-4 text-center hover:shadow-2xl transition cursor-pointer border-1 "
               >
                 <div className="h-16 w-auto mx-auto mb-2 relative mb-4">
                   <Image
@@ -106,8 +106,8 @@ export default function Home() {
             Why choose our platform
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
+            <div className="text-center hover:shadow-2xl transition rounded-md mt-4">
               <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Car className="h-8 w-8" />
               </div>
@@ -117,7 +117,8 @@ export default function Home() {
                 private sellers.
               </p>
             </div>
-            <div className="text-center">
+
+            <div className="text-center hover:shadow-2xl transition rounded-md mt-4">
               <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Calendar className="h-8 w-8" />
               </div>
@@ -127,7 +128,8 @@ export default function Home() {
                 options.
               </p>
             </div>
-            <div className="text-center">
+
+            <div className="text-center hover:shadow-2xl transition rounded-md mt-4">
               <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8" />
               </div>
