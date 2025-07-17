@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useRouter } from "next/navigation";
 
 const HomeSearch = () => {
   const [serachTerm, setSerachTerm] = useState("");
@@ -13,12 +14,17 @@ const HomeSearch = () => {
   const [searchImage, setSearchImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  const router = useRouter();
+
   const handleTextSubmit = (e) => {
     e.preventDefault();
     if (!serachTerm.trim()) {
       toast.error("Please enter a search term");
       return;
     }
+
+    // encodeURIComponent converts into a safe format.
+    router.push(`/cars?search=${encodeURIComponent(serachTerm)}`);
   };
 
   const handleImageSearch = async (e) => {
@@ -156,10 +162,9 @@ const HomeSearch = () => {
           {/* Image search button */}
           {imagePreview && (
             <Button
-              className="cursor-pointer"
+              className="cursor-pointer w-full mt-2"
               type="submit"
               disabled={isUploading}
-              variant="outline"
             >
               {isUploading ? "Uploading..." : "Search with this image"}
             </Button>
