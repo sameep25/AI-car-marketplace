@@ -100,14 +100,14 @@ export default function Home() {
       </section>
 
       {/* Why choose us */}
-      <section className="py-16">
+      <section className="py-16  px-10 ">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-12">
             Why choose our platform
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
-            <div className="text-center hover:shadow-2xl transition rounded-md mt-4">
+            <div className="text-center hover:shadow-2xl transition border-1 rounded-md mt-4 p-4 shadow-xl ">
               <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Car className="h-8 w-8" />
               </div>
@@ -118,7 +118,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="text-center hover:shadow-2xl transition rounded-md mt-4">
+            <div className="text-center hover:shadow-2xl transition rounded-md mt-4 shadow-xl border-1 p-4 ">
               <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Calendar className="h-8 w-8" />
               </div>
@@ -129,7 +129,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="text-center hover:shadow-2xl transition rounded-md mt-4">
+            <div className="text-center hover:shadow-2xl transition rounded-md mt-4 shadow-xl border-1 p-4 ">
               <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8" />
               </div>
