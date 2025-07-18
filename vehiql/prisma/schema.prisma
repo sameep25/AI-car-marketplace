@@ -15,20 +15,149 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// User model
-model User {
-  id          String   @id @default(uuid())
-  clerkUserId String   @unique
-  email       String   @unique
-  name        String
-  imageUrl    String
-  phone       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  role        UserRole @default(USER)
-}
-
+// User Role enum
 enum UserRole {
   USER
   ADMIN
+}
+
+// User model
+model User {
+  id               String             @id @default(uuid())
+  clerkUserId      String             @unique
+  email            String             @unique
+  name             String
+  imageUrl         String
+  phone            String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  role             UserRole           @default(USER)
+  UserSavedCar     UserSavedCar[]
+  TestDriveBooking TestDriveBooking[]
+}
+
+// Car model and CarStatus enum
+enum CarStatus {
+  AVAILABLE
+  UNAVAILABLE
+  SOLD
+}
+
+model Car {
+  id                String             @id @default(uuid())
+  make              String
+  model             String
+  year              Int
+  price             Decimal            @db.Decimal(10, 2) //on right side of decimal 10 digits are allowed and on left side 2 digits
+  mileage           Int
+  color             String
+  fuelType          String
+  transmission      String
+  bodyType          String
+  seats             Int?
+  description       String
+  status            CarStatus          @default(AVAILABLE)
+  featured          Boolean            @default(false)
+  images            String[] // Array of Supabase storage URLs
+  savedBy           UserSavedCar[]
+  testDriveBookings TestDriveBooking[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  //  index definitions - An index is a database optimization feature that makes read operations faster for specific fields.
+  @@index([make, model])
+  @@index([bodyType])
+  @@index([price])
+  @@index([year])
+  @@index([status])
+  @@index([fuelType])
+  @@index([featured])
+}
+
+// Single dealership configuration, if you have multiple dealerships, you can remove default values.
+model DealershipInfo {
+  id           String        @id @default(uuid())
+  name         String        @default("Vehiql Motors")
+  address      String        @default("69 Car Street, Autoville, CA 69420")
+  phone        String        @default("+1 (555) 123-4567")
+  email        String        @default("contact@vehiql.com")
+  workingHours WorkingHour[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+// Working hours configuration
+model WorkingHour {
+  id           String @id @default(uuid()) //dealership-id it belongs to
+  dealershipId String
+
+  //creating relation with Dealer shipInfo Table
+  // field in this table relates with id in DealershipInfo table
+  // onDelete : cascade means if the dealershipInfo is deleted than in workingHour table gets deleted 
+  dealership DealershipInfo @relation(fields: [dealershipId], references: [id], onDelete: Cascade)
+
+  dayOfWeek DayOfWeek
+  openTime  String // Format: "HH:MM" (24-hour)
+  closeTime String // Format: "HH:MM" (24-hour)
+  isOpen    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([dealershipId, dayOfWeek])
+  @@index([dealershipId])
+  @@index([dayOfWeek])
+  @@index([isOpen])
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+// UserSavedCar model
+model UserSavedCar {
+  id      String   @id @default(uuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carId   String
+  car     Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  savedAt DateTime @default(now())
+
+  @@unique([userId, carId])
+  @@index([userId])
+  @@index([carId])
+}
+
+// TestDriveBooking model and Booking status enum
+model TestDriveBooking {
+  id          String        @id @default(uuid())
+  carId       String
+  car         Car           @relation(fields: [carId], references: [id])
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  bookingDate DateTime      @db.Date
+  startTime   String // Format: "HH:MM" (24-hour)
+  endTime     String // Format: "HH:MM" (24-hour)
+  status      BookingStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([carId])
+  @@index([userId])
+  @@index([bookingDate])
+  @@index([status])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
 }
