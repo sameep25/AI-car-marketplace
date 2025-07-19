@@ -1,5 +1,6 @@
 // To commuinate with the db ,need to create a prisma instance
-import { PrismaClient } from "@prisma/client";
+
+import { PrismaClient } from "@/generated/prisma";
 
 export const db = globalThis.prisma || new PrismaClient();
 

@@ -25,13 +25,14 @@ export const checkUser = async () => {
     const newUser = await db.user.create({
       data: {
         clerkUserId: user.id,
-        name: `${user.firstname} ${user.lastName}`,
+        name: `${user.firstName} ${user.lastName}`,
         imageUrl: user.imageUrl,
         email: user.emailAddresses[0].emailAddress,
+        phone: user.phoneNumbers?.[0]?.phoneNumber ?? null,
       },
     });
     return newUser;
   } catch (error) {
-    console.log(error.message);
+    console.log("CheckUser page ->" + error.message);
   }
 };

@@ -8,7 +8,7 @@ import { checkUser } from "@/lib/checkUser";
 
 const Header = async ({ isAdminPage = false }) => {
   const user = await checkUser(); //checks if the user is presnt in db,if not creates a new user in db
-  const isAdmin = user.role === "ADMIN";
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <header className="fixed top-0 w-full bg-white/80  backdrop-blur-md z-50 border-b">
