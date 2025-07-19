@@ -4,7 +4,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/dist/types/server";
+import { auth } from "@clerk/nextjs/server";
 
 // fetch a admin user from a db through userId
 export async function getAdmin() {
