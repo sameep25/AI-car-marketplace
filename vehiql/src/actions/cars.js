@@ -3,7 +3,11 @@
 
 "use server";
 
+import { db } from "@/lib/prisma";
+import { createClient } from "@/lib/superbase";
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { cookies } from "next/headers";
 
 // function to convert File to Base64
 async function fileToBase64(file) {
@@ -12,6 +16,7 @@ async function fileToBase64(file) {
   return buffer.toString("base64"); //Encodes the buffer into a Base64 string
 }
 
+// processing the Car image with gemini api
 export async function processCarImageWithAI(file) {
   try {
     //check if API key is available
@@ -110,4 +115,65 @@ export async function processCarImageWithAI(file) {
   } catch (error) {
     throw new Error("Gemini API error: " + error.message);
   }
+}
+
+// adding the cars data to the db
+export async function addCarToDB({ carData, images }) {
+  try {
+    const { userId } = await auth(); // check if user is loggedin
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      // check if user exists in db
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const carId = uuidv4(); //unique id for cars
+    const folderPath = `cars/${carId}`; //intialize a carfolder path in superbase storage
+
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
+
+    const imageUrls = [];
+
+    //loop through images
+    for (let i = 0; i < images.length; i++) {
+      const base64Data = images[i];
+
+      // skip if image data is not valid
+      if (!base64Data || !base64Data.startsWith("data:image/")) {
+        console.warn("skipping invalid image data");
+        continue;
+      }
+
+      // extract the base 64 part(remove the data:image/xyz;base64, prefix)
+      const base64 = base64Data.split(",")[1];
+      const imageBuffer = Buffer.from(base64, "base64");
+
+      //determine image extension from the data URL
+      const mimeMatch = base64Data.match(/data:image\/([a-zA-Z0-9]+);/);
+      const fileExtenstion = mimeMatch ? mimeMatch[1] : "jpeg";
+
+      // create filename
+      const fileName = `image-${Date.now()}-${i}.${fileExtenstion}`;
+      const filePath = `${folderPath}/${fileName}`;
+
+      // uploading the images in storage bucket in superbase
+      const { data, error } = await supabase.storage
+        .from("car-images")
+        .upload(filePath, imageBuffer, {
+          contentType: `image/${fileExtenstion}`,
+        });
+
+      if (error) {
+        console.error("Error while uploading the image : ", error);
+        throw new Error(`Failed to upload the image : ${error.message}`);
+      }
+
+      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`;
+      imageUrls.push(publicUrl);
+    }
+  } catch (error) {}
 }
