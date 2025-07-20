@@ -7,6 +7,7 @@ import { db } from "@/lib/prisma";
 import { createClient } from "@/lib/superbase";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 // function to convert File to Base64
@@ -174,6 +175,36 @@ export async function addCarToDB({ carData, images }) {
 
       const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`;
       imageUrls.push(publicUrl);
+
+      // Add the car to the database
+      const car = await db.car.create({
+        data: {
+          id: carId, // Use the same ID we used for the folder
+          make: carData.make,
+          model: carData.model,
+          year: carData.year,
+          price: carData.price,
+          mileage: carData.mileage,
+          color: carData.color,
+          fuelType: carData.fuelType,
+          transmission: carData.transmission,
+          bodyType: carData.bodyType,
+          seats: carData.seats,
+          description: carData.description,
+          status: carData.status,
+          featured: carData.featured,
+          images: imageUrls, // Store the array of image URLs
+        },
+      });
+
+      revalidatePath("/admin/cars");
+
+      return {
+        car: car,
+        success: true,
+      };
     }
-  } catch (error) {}
+  } catch (error) {
+    throw new Error("Error while adding the car : ", error.message);
+  }
 }
