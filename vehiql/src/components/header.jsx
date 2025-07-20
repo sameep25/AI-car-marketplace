@@ -6,7 +6,7 @@ import { ArrowLeft, CarFront, Heart, Layout } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { checkUser } from "@/lib/checkUser";
 
-const Header = async ({ isAdminPage = false }) => {
+const Header = async ({ isAdminPage }) => {
   const user = await checkUser(); //checks if the user is presnt in db,if not creates a new user in db
   const isAdmin = user?.role === "ADMIN";
 
