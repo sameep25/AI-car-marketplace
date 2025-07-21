@@ -12,7 +12,7 @@ const useFatch = (cb) => {
 
     try {
       const response = await cb(...args);
-      setData(response());
+      setData(response);
       setError(null);
     } catch (error) {
       setError(error);
