@@ -9,6 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { v4 as uuidv4 } from "uuid";
 
 // function to convert File to Base64
 async function fileToBase64(file) {
@@ -200,11 +201,10 @@ export async function addCarToDB({ carData, images }) {
       revalidatePath("/admin/cars");
 
       return {
-        car: car,
         success: true,
       };
     }
   } catch (error) {
-    throw new Error("Error while adding the car : ", error.message);
+    throw new Error(`Error : ${error.message}`);
   }
 }
