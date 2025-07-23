@@ -29,9 +29,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { addCar, processCarImageWithAI } from "@/actions/cars";
-// import useFetch from "@/hooks/use-fetch";
+import { addCarToDB, processCarImageWithAI } from "@/actions/cars";
+
 import Image from "next/image";
+import useFetch from "../../../../../../hooks/use-fetch";
 // Predefined options
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"];
 const transmissions = ["Automatic", "Manual", "Semi-Automatic"];
@@ -100,17 +101,45 @@ const AddCarForm = () => {
 
   const [activeTab, setActiveTab] = useState("ai");
   const [imageError, setImageError] = useState("");
-  const router = useRouter();
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [uploadedAiImage, setUploadedAiImage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const router = useRouter();
 
+  // initializeing the custom UseFetch hook to add car in db
+  const {
+    data: addCarResult,
+    loading: addCarLoading,
+    fn: addCarFn,
+  } = useFetch(addCarToDB);
+
+  // check if the car is added or not
+  useEffect(() => {
+    if (addCarResult?.success) {
+      toast.success("Car added successfully");
+      router.push("/admin/cars");
+    }
+  }, [addCarResult]);
+
+  // handle form submit
   const onSubmitForm = async (data) => {
     if (uploadedImages.length === 0) {
       setImageError("Please upload atleast one image");
       return;
     }
+    console.log(data);
+
+    //restructure the carData
+    const carData = {
+      ...data,
+      year: parseInt(data.year),
+      price: parseInt(data.price),
+      mileage: parseInt(data.mileage),
+      seats: data.seats ? parseInt(data.seats) : null,
+    };
+
+    await addCarFn({ carData, images: uploadedImages }); //from useFetch
   };
 
   // image dropbox logic
@@ -144,14 +173,13 @@ const AddCarForm = () => {
       reader.readAsDataURL(file);
     });
   };
-
   const {
     getRootProps: getMultiImageRootProps,
     getInputProps: getMultiImageInputProps,
   } = useDropzone({
     onDrop: onMultiImagesDrop,
     accept: {
-      "image/*": [".jpeg", "jpg", ".png", ".webp"],
+      "image/*": [".jpeg", ".jpg", ".png", ".webp"],
     },
     multiple: true,
   });
@@ -505,11 +533,11 @@ const AddCarForm = () => {
 
                 <Button
                   type="submit"
-                  className="w-full md:w-auto"
-                  disabled={true}
+                  className="w-full md:w-auto cursor-pointer"
+                  disabled={addCarLoading}
                 >
                   {" "}
-                  {true ? (
+                  {addCarLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Adding Car...
