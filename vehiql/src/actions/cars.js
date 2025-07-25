@@ -328,3 +328,39 @@ export async function deleteCars(carId) {
     };
   }
 }
+
+//updateCarStatus
+export async function updateCarStatus(carId, { status, featured }) {
+  try {
+    // check if user is loggedin
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      // check if user exists in db
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const updatedData = {};
+    if (status !== undefined) updatedData.status = status;
+    if (featured !== undefined) updatedData.featured = status;
+
+    await db.cars.update({
+      where: { carId },
+      data: updatedData,
+    });
+
+    revalidatePath("/admin/cars");
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error(`Error while upadating the Car status ${error}`);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
