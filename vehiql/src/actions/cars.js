@@ -22,11 +22,11 @@ async function fileToBase64(file) {
 export async function processCarImageWithAI(file) {
   try {
     //check if API key is available
-    if (process.env.GEMENI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       throw new Error("Gemini API Key is not configured");
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMENI_API_KEY);
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // converting the image into base64 string
@@ -47,10 +47,10 @@ export async function processCarImageWithAI(file) {
       3. Year (approximately)
       4. Color
       5. Body type (SUV, Sedan, Hatchback, etc.)
-      6. Mileage
+      6. Mileage (in KM per litre)
       7. Fuel type (your best guess)
       8. Transmission type (your best guess)
-      9. Price (your best guess)
+      9. Price (your best guess in dollars)
       9. Short Description as to be added to a car listing
 
       Format your response as a clean JSON object with these fields:
@@ -59,12 +59,13 @@ export async function processCarImageWithAI(file) {
         "model": "",
         "year": 0000,
         "color": "",
-        "price": "",
-        "mileage": "",
+        "price": 000000,
+        "mileage": 0000,
         "bodyType": "",
         "fuelType": "",
         "transmission": "",
         "description": "",
+        "seats": 00,
         "confidence": 0.0
       }
 
@@ -74,7 +75,7 @@ export async function processCarImageWithAI(file) {
 
     const result = await model.generateContent([imagePart, prompt]); // generate a result
     const response = await result.response;
-    const text = response.text; // take the text from the response
+    const text = response.text(); // take the text from the response
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim(); // clean the resposne text
 
     // validate the response and return the final resposnse
@@ -115,6 +116,7 @@ export async function processCarImageWithAI(file) {
       };
     }
   } catch (error) {
+    console.log(error.message);
     throw new Error("Gemini API error: " + error.message);
   }
 }
