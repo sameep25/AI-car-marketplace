@@ -3,6 +3,7 @@
 
 "use server";
 
+import { serializedCarsData } from "@/lib/helper";
 import { db } from "@/lib/prisma";
 import { createClient } from "@/lib/superbase";
 import { auth } from "@clerk/nextjs/server";
@@ -137,6 +138,7 @@ export async function addCarToDB({ carData, images }) {
     const carId = uuidv4(); //unique id for cars
     const folderPath = `cars/${carId}`; //intialize a carfolder path in superbase storage
 
+    // For image storage
     const cookieStore = await cookies();
     const supabase = createClient(cookieStore);
 
@@ -208,5 +210,121 @@ export async function addCarToDB({ carData, images }) {
     }
   } catch (error) {
     throw new Error(`Error : ${error.message}`);
+  }
+}
+
+//fetch cars from db
+export async function getCars(search = "") {
+  try {
+    // check if user is loggedin
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      // check if user exists in db
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    let where = {};
+
+    if (search) {
+      where.OR = [
+        { make: { contains: search, mode: "insensitive" } },
+        { model: { contains: search, mode: "insensitive" } },
+        { color: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const cars = await db.car.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+    });
+
+    const serializedCars = cars.map(serializedCarsData);
+
+    return {
+      success: true,
+      data: serializedCars,
+    };
+  } catch (error) {
+    console.error(`Error while gettingCars from DB ${error}`);
+    return {
+      success: true,
+      error: error.message,
+    };
+  }
+}
+
+// delete car and its images from db
+export async function deleteCars(carId) {
+  try {
+    // check if user is loggedin
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      // check if user exists in db
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    // check if the car is present in db
+    const car = await db.cars.findUnique({
+      where: { carId },
+      select: { images: true },
+    });
+
+    // return if no car is foudn
+    if (!car) {
+      return {
+        success: false,
+        error: "Car Not found",
+      };
+    }
+
+    // delete the car
+    await db.car.delete({
+      where: { carId },
+    });
+
+    // deleting images from the storage bucket
+    try {
+      const cookieStore = await cookies();
+      const supabase = createClient(cookieStore);
+
+      const filePaths = car.images
+        .map((imageUrl) => {
+          const url = new URL(imageUrl);
+          const pathMatch = url.pathname.match(/\/car-images\/(.*)/);
+          return pathMatch ? pathMatch[1] : null;
+        })
+        .filter(Boolean);
+
+      if (filePaths.length > 0) {
+        const { error } = await supabase.storage
+          .from("car-images")
+          .remove(filePaths);
+
+        if (error) {
+          console.error(`Error deleting images : ${error}`);
+        }
+      }
+    } catch (storageError) {
+      console.error("Error while deleting images : ", storageError);
+    }
+
+    revalidatePath("/admin/cars");
+    return {
+      success: true,
+    };
+  } catch (error) {
+    log.error(`Error with storage operations ${error}`);
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 }
