@@ -330,7 +330,7 @@ export async function deleteCars(carId) {
 }
 
 //updateCarStatus
-export async function updateCarStatus(carId, { status, featured }) {
+export async function updateCarStatus(id, { status, featured }) {
   try {
     // check if user is loggedin
     const { userId } = await auth();
@@ -345,10 +345,10 @@ export async function updateCarStatus(carId, { status, featured }) {
 
     const updatedData = {};
     if (status !== undefined) updatedData.status = status;
-    if (featured !== undefined) updatedData.featured = status;
+    if (featured !== undefined) updatedData.featured = featured;
 
-    await db.cars.update({
-      where: { carId },
+    await db.car.update({
+      where: { id: id },
       data: updatedData,
     });
 
