@@ -4,11 +4,14 @@ import { Input } from "@/components/ui/input";
 import {
   CarIcon,
   Edit,
+  Eye,
   Loader2,
+  MoreHorizontal,
   Plus,
   Search,
   Star,
   StarOff,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,9 +31,20 @@ import {
 import Image from "next/image";
 import { formatCurrency } from "@/lib/helper";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 const CarList = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [carToDelete, setCarToDelete] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // getCars
   const {
@@ -58,7 +72,7 @@ const CarList = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    //api call
+    getCarFn(searchTerm);
   };
 
   // cuatom badges for car availability
@@ -85,14 +99,56 @@ const CarList = () => {
     }
   };
 
-  // handling status update
+  // handling featured update
   const handleToggleFeatured = async (car) => {
     await updateCarFn(car.id, { featured: !car.featured });
   };
 
+  // handling status update
+  const handleStatusUpdate = async (car, newStatus) => {
+    await updateCarFn(car.id, { status: newStatus });
+  };
+
+  // handling delete update
+  const handleDeleteUpdate = async (car) => {
+    if (!carToDelete) return;
+
+    await deleteCarFn(carToDelete.id);
+    setDeleteDialogOpen(false);
+    setCarToDelete(null);
+  };
+
+  // Call the getCarsFn on search term change
   useEffect(() => {
     getCarFn(searchTerm);
   }, [searchTerm]);
+
+  // handling successful operations
+  useEffect(() => {
+    if (deletedCarData?.success) {
+      toast.success("Car deleted successfully");
+      getCarFn();
+    }
+
+    if (updatedCarData?.success) {
+      // console.log(updatedCarData);
+      toast.success("Car updated successfully");
+      getCarFn(searchTerm);
+    }
+  }, [updatedCarData, deletedCarData, searchTerm]);
+
+  // handling errors
+  useEffect(() => {
+    if (getCarsError) {
+      toast.error("Failed to fetch cars");
+    }
+    if (updatedCarsError) {
+      toast.error("Failed to update car");
+    }
+    if (deleteCarError) {
+      toast.error("Failed to delete cars");
+    }
+  }, [getCarsError, updatedCarsError, deleteCarError]);
 
   return (
     <div className="space-y-4">
@@ -129,6 +185,7 @@ const CarList = () => {
           ) : getCarsData?.success && getCarsData.data.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
+                {/* table Head */}
                 <TableHeader>
                   <TableRow>
                     <TableHead></TableHead>
@@ -137,9 +194,10 @@ const CarList = () => {
                     <TableHead>Price</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Featured</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
+                {/* Tablebody - map all the cars */}
                 <TableBody>
                   {getCarsData.data.map((car) => {
                     return (
@@ -167,6 +225,7 @@ const CarList = () => {
                         <TableCell>{car.year}</TableCell>
                         <TableCell>{formatCurrency(car.price)}</TableCell>
                         <TableCell>{getStatusBadge(car.status)} </TableCell>
+                        {/* Featured */}
                         <TableCell>
                           <Button
                             variant="ghost"
@@ -182,9 +241,39 @@ const CarList = () => {
                             )}
                           </Button>
                         </TableCell>
-                        <TableCell>
-                          {" "}
-                          <Edit />{" "}
+                        <TableCell className="">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="p-0 h-8 w-8"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => router.push(`/cars/${car.id}`)}
+                              >
+                                <Eye className="mr-2 h-4 w-4" /> View
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuLabel>Status</DropdownMenuLabel>
+                              <DropdownMenuItem>
+                                Set Unavailable
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>Set Available</DropdownMenuItem>
+                              <DropdownMenuItem>Mark as sold</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-red-600">
+                                <Trash2 className="mr-2 h-4 w-4 text-red-600" />{" "}
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     );
