@@ -2,7 +2,6 @@
 
 import { getAuthenticatedUser } from "@/lib/getAuthenticatedUser";
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
 export async function getDealershipInfo() {
@@ -148,5 +147,54 @@ export async function saveWorkingHours() {
     return {
       success: false,
     };
+  }
+}
+
+export async function getUsers() {
+  try {
+    const user = getAuthenticatedUser();
+    if (user.role !== "ADMIN") {
+      throw new Error("Unauthorized : Admin access required");
+    }
+
+    // get all users
+    const users = db.User.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return {
+      success: true,
+      data: users.map((user) => ({
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      })),
+    };
+  } catch (error) {
+    console.error(`Error in getUsers server action -> ${error.message}`);
+    return {
+      success: false,
+    };
+  }
+}
+
+export async function updateUserRole(userId, role) {
+  try {
+    const user = getAuthenticatedUser();
+    if (user.role !== "ADMIN") {
+      throw new Error("Unauthorised : Admin access required");
+    }
+
+    await db.User.update({
+      where: { id: userId },
+      data: { role },
+    });
+
+    revalidatePath("/");
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error(`Error in updateUserRole server action ${error.message}`);
   }
 }
