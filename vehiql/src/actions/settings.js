@@ -1,17 +1,14 @@
+"use server";
+
+import { getAuthenticatedUser } from "@/lib/getAuthenticatedUser";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 export async function getDealershipInfo() {
   try {
     // check if user is authorizsed
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorised User");
-
-    // find the user in db
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-    if (!user) throw new Error("User not found");
+    const user = await getAuthenticatedUser();
 
     // Get the dealership record
     let dealership = await db.DealershipInfo.findFirst({
@@ -99,6 +96,54 @@ export async function getDealershipInfo() {
   } catch (error) {
     console.error(
       `Error in getDealerShipInfo server action -> ${error.message}`
+    );
+    return {
+      success: false,
+    };
+  }
+}
+
+export async function saveWorkingHours() {
+  try {
+    // check if user is authorizsed
+    const user = await getAuthenticatedUser();
+    if (user.role !== "ADMIN") {
+      throw new Error("Unauthorized : Admin access required");
+    }
+
+    // Get current dealership info
+    const dealership = await db.dealershipInfo.findFirst();
+    if (!dealership) {
+      throw new Error("Dealership info not found");
+    }
+
+    //update dealership hours-first deleteexisting hours
+    await db.workingHour.deleteMany({
+      where: { dealershipId: dealership.id },
+    });
+
+    // Then create new hours
+    for (const hour of workingHours) {
+      await db.workingHour.create({
+        data: {
+          dayOfWeek: hour.dayOfWeek,
+          openTime: hour.openTime,
+          closeTime: hour.closeTime,
+          isOpen: hour.isOpen,
+          dealershipId: dealership.id,
+        },
+      });
+    }
+
+    revalidatePath("/admin/settings");
+    revalidatePath("/");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error(
+      `Error in saveWorkingHours server action -> ${error.message}`
     );
     return {
       success: false,
