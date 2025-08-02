@@ -19,7 +19,6 @@ export async function getDealershipInfo() {
         },
       },
     });
-    console.log(dealership);
 
     // If no dealership exists, create a default one
     if (!dealership) {
@@ -106,7 +105,7 @@ export async function saveWorkingHours(workingHours) {
   try {
     // check if user is authorizsed
     const user = await getAuthenticatedUser();
-    if (user.role !== "ADMIN") {
+    if (user?.role !== "ADMIN") {
       throw new Error("Unauthorized : Admin access required");
     }
 
@@ -150,13 +149,13 @@ export async function saveWorkingHours(workingHours) {
 
 export async function getUsers() {
   try {
-    const user = getAuthenticatedUser();
-    if (user.role !== "ADMIN") {
+    const user = await getAuthenticatedUser();
+    if (user?.role !== "ADMIN") {
       throw new Error("Unauthorized : Admin access required");
     }
 
     // get all users
-    const users = db.User.findMany({
+    const users = await db.User.findMany({
       orderBy: { createdAt: "desc" },
     });
 
@@ -178,8 +177,8 @@ export async function getUsers() {
 
 export async function updateUserRole(userId, role) {
   try {
-    const user = getAuthenticatedUser();
-    if (user.role !== "ADMIN") {
+    const user = await getAuthenticatedUser();
+    if (user?.role !== "ADMIN") {
       throw new Error("Unauthorised : Admin access required");
     }
 
