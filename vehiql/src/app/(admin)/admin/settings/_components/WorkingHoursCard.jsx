@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -34,12 +33,14 @@ const DAYS = [
 ];
 
 const WorkingHoursCard = () => {
+  //custom hooks to for settings server action
   const {
     loading: saveWorkingHoursLoading,
     fn: saveWorkingHoursFn,
     data: saveWorkingHoursData,
     error: saveWorkingHoursError,
   } = useFetch(saveWorkingHours);
+
   const {
     loading: getDealershipInfoLoading,
     fn: getDealershipInfoFn,
@@ -53,15 +54,6 @@ const WorkingHoursCard = () => {
     data: getUsersData,
     error: getUsersError,
   } = useFetch(getUsers);
-
-  const {
-    loading: updateUserRoleLoading,
-    fn: updateUserRoleFn,
-    data: updateUserRoleData,
-    error: updateUserRoleError,
-  } = useFetch(updateUserRole);
-
-  const [userSearch, setUserSearch] = useState("");
 
   // intiating default working hours
   const [workingHours, setWorkingHours] = useState(
