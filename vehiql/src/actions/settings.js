@@ -102,7 +102,7 @@ export async function getDealershipInfo() {
   }
 }
 
-export async function saveWorkingHours() {
+export async function saveWorkingHours(workingHours) {
   try {
     // check if user is authorizsed
     const user = await getAuthenticatedUser();
@@ -141,9 +141,7 @@ export async function saveWorkingHours() {
       success: true,
     };
   } catch (error) {
-    console.error(
-      `Error in saveWorkingHours server action -> ${error.message}`
-    );
+    console.error(`Error in saveWorkingHours server action -> ${error}`);
     return {
       success: false,
     };
