@@ -1,11 +1,13 @@
 "use client";
-import { Camera, Upload } from "lucide-react";
-import { useState } from "react";
+import { Camera, Loader2, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useRouter } from "next/navigation";
+import useFetch from "../../hooks/use-fetch";
+import { processAiImageSearch } from "@/actions/home";
 
 const HomeSearch = () => {
   const [serachTerm, setSerachTerm] = useState("");
@@ -16,26 +18,39 @@ const HomeSearch = () => {
 
   const router = useRouter();
 
-  const handleTextSubmit = (e) => {
-    e.preventDefault();
-    if (!serachTerm.trim()) {
-      toast.error("Please enter a search term");
-      return;
+  // hook
+  const {
+    loading: aiImageSearchLoading,
+    fn: aiImageSearchFn,
+    data: aiImageSearchData,
+    error: aiImageSearchError,
+  } = useFetch(processAiImageSearch);
+
+  // handle server action errors
+  useEffect(() => {
+    if (aiImageSearchError) {
+      toast.error(
+        "Failed to analyse image : " +
+          (aiImageSearchError.message || "Unknown Error")
+      );
     }
+  }, [aiImageSearchError]);
 
-    // encodeURIComponent converts into a safe format.
-    router.push(`/cars?search=${encodeURIComponent(serachTerm)}`);
-  };
+  // handle success image search
+  useEffect(() => {
+    if (aiImageSearchData?.success) {
+      const params = new URLSearchParams();
 
-  const handleImageSearch = async (e) => {
-    e.preventDefault();
-    if (!searchImage) {
-      toast.error("Please upload an image first");
-      return;
+      if (aiImageSearchData.data.make)
+        params.set("make", aiImageSearchData.data.make);
+      if (aiImageSearchData.data.bodyType)
+        params.set("make", aiImageSearchData.data.bodyType);
+      if (aiImageSearchData.data.color)
+        params.set("make", aiImageSearchData.data.makecolor);
+
+      router.push(`/cars?${params.toString()}`);
     }
-
-    // Ai logic
-  };
+  });
 
   // handling image input
   const onDrop = (acceptedFiles) => {
@@ -49,8 +64,8 @@ const HomeSearch = () => {
 
     setIsUploading(true);
     setSearchImage(file);
-    const reader = new FileReader();
 
+    const reader = new FileReader();
     reader.onloadend = () => {
       // image
       setImagePreview(reader.result);
@@ -70,10 +85,33 @@ const HomeSearch = () => {
     useDropzone({
       onDrop,
       accept: {
-        "image/*": [".jpeg", "jpg", ".png"],
+        "image/*": [".jpeg", ".jpg", ".png"],
       },
       maxFiles: 1,
     });
+
+  const handleTextSubmit = (e) => {
+    e.preventDefault();
+    if (!serachTerm.trim()) {
+      toast.error("Please enter a search term");
+      return;
+    }
+
+    // encodeURIComponent converts into a safe format.
+    router.push(`/cars?search=${encodeURIComponent(serachTerm)}`);
+  };
+
+  // ai image search
+  const handleImageSearch = async (e) => {
+    console.log("clicked");
+    e.preventDefault();
+    if (!searchImage) {
+      toast.error("Please upload an image first");
+      return;
+    }
+
+    await aiImageSearchFn(searchImage);
+  };
 
   return (
     <div>
@@ -157,18 +195,27 @@ const HomeSearch = () => {
                 </div>
               )}
             </div>
+            {/* Image search button */}
+            {imagePreview && (
+              <Button
+                className="cursor-pointer w-full mt-2"
+                type="submit"
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  "Uploading..."
+                ) : (
+                  <>
+                    {aiImageSearchLoading ? (
+                      <Loader2 className="h-4 w-4 amimate-spin" />
+                    ) : (
+                      "Search with this image"
+                    )}{" "}
+                  </>
+                )}
+              </Button>
+            )}
           </form>
-
-          {/* Image search button */}
-          {imagePreview && (
-            <Button
-              className="cursor-pointer w-full mt-2"
-              type="submit"
-              disabled={isUploading}
-            >
-              {isUploading ? "Uploading..." : "Search with this image"}
-            </Button>
-          )}
         </div>
       )}
     </div>
