@@ -1,12 +1,10 @@
 "use client";
-
 import HomeSearch from "@/components/HomeSearch";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Car, Calendar, Shield } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
-import { featuredCars, bodyTypes, carMakes, faqItems } from "@/lib/data";
+import { bodyTypes, carMakes, faqItems } from "@/lib/data";
 import CarCard from "@/components/CarCard";
 import Link from "next/link";
 import {
@@ -16,9 +14,20 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SignedOut } from "@clerk/nextjs";
+import { getFeaturedCars } from "@/actions/home";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const router = useRouter();
+  const [featuredCars, setFeaturedCars] = useState([]);
+
+  useEffect(() => {
+    fetchFeaturedCars();
+  }, []);
+
+  const fetchFeaturedCars = async () => {
+    const cars = await getFeaturedCars();
+    setFeaturedCars(cars.data);
+  };
 
   return (
     <div className="pt-20 flex flex-col bg-gray-50">
@@ -55,7 +64,7 @@ export default function Home() {
 
         {/* Featured Cars Car-card*/}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredCars.map((car) => {
+          {featuredCars?.map((car) => {
             return <CarCard key={car.id} car={car} />;
           })}
         </div>

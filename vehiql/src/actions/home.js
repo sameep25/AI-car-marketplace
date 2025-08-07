@@ -15,8 +15,11 @@ async function fileToBase64(file) {
 
 export async function getFeaturedCars(limit = 3) {
   try {
-    const cars = await db.Cars.findMany({
-      where: { feature: true, status: "AVAILABLE" },
+    const cars = await db.Car.findMany({
+      where: {
+        featured: true,
+        status: "AVAILABLE",
+      },
       take: limit,
       orderBy: { createdAt: "desc" },
     });
