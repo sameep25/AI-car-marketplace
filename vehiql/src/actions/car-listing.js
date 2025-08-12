@@ -1,7 +1,9 @@
 "use server";
 
 import { getAuthenticatedUser } from "@/lib/getAuthenticatedUser";
+import { serializedCarsData } from "@/lib/helper";
 import { db } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 // creating filter on the basis of cars in db
 export async function getCarFilters() {
@@ -9,7 +11,7 @@ export async function getCarFilters() {
     // get unique makes
     const makes = await db.Car.findMany({
       where: { status: "AVAILABLE" },
-      select: { make: ture },
+      select: { make: true },
       distinct: ["make"],
       orderBy: { make: "asc" },
     });
@@ -17,7 +19,7 @@ export async function getCarFilters() {
     // get unique bodyTypes
     const bodyTypes = await db.Car.findMany({
       where: { status: "AVAILABLE" },
-      select: { bodyType: ture },
+      select: { bodyType: true },
       distinct: ["bodyType"],
       orderBy: { bodyType: "asc" },
     });
@@ -25,7 +27,7 @@ export async function getCarFilters() {
     // get unique fuelTypes
     const fuelTypes = await db.Car.findMany({
       where: { status: "AVAILABLE" },
-      select: { fuelType: ture },
+      select: { fuelType: true },
       distinct: ["fuelType"],
       orderBy: { fuelType: "asc" },
     });
@@ -33,7 +35,7 @@ export async function getCarFilters() {
     // get unique transmissions
     const transmissions = await db.Car.findMany({
       where: { status: "AVAILABLE" },
-      select: { transmission: ture },
+      select: { transmission: true },
       distinct: ["transmission"],
       orderBy: { transmission: "asc" },
     });
@@ -62,10 +64,12 @@ export async function getCarFilters() {
       },
     };
   } catch (error) {
-    throw new Error("Error fetching car filters: ", error.message);
+    console.error("Error fetching car filters:", error);
+    throw new Error(`Error fetching car filters: ${error.message}`);
   }
 }
 
+// fetch cars as per filters
 export async function getCarsByFilters({
   search = "",
   make = "",
@@ -102,11 +106,131 @@ export async function getCarsByFilters({
 
     // Add price range
     where.price = {
-      gte: parseFloat(minPrice) || 0,
+      gte: parseFloat(minPrice) || 0, //gte - price is greater then minPrice
     };
 
     if (maxPrice && maxPrice < Number.MAX_SAFE_INTEGER) {
-      where.price.lte = parseFloat(maxPrice);
+      where.price.lte = parseFloat(maxPrice); //lte - price is lower then maxPrice
     }
-  } catch (error) {}
+
+    const skip = (page - 1) * limit;
+
+    // Determine sort order
+    let orderBy = {};
+    switch (sortBy) {
+      case "priceAsc":
+        orderBy = { price: "asc" };
+        break;
+
+      case "priceDesc":
+        orderBy = { price: "desc" };
+        break;
+
+      case "newest":
+      default:
+        orderBy = { createdAt: "desc" };
+        break;
+    }
+
+    const totalCarsCount = await db.Car.count({ where });
+
+    // execute the main query
+    const cars = await db.Car.findMany({
+      where,
+      take: limit,
+      skip,
+      orderBy,
+    });
+
+    let wishlisted = new Set(); //create a set so cars are not repeated
+    if (user) {
+      const savedCars = await db.UserSavedCars.findMany({
+        where: { userId: user.id },
+        select: { carId: true },
+      });
+
+      wishlisted = new Set(savedCars.map((saved) => saved.carId));
+
+      const serializedCars = cars.map((car) => {
+        serializedCarsData(car, wishlisted.has(car.id));
+      });
+
+      return {
+        success: true,
+        data: serializedCars,
+        pagination: {
+          total: totalCars,
+          page,
+          limit,
+          pages: Math.ceil(totalCars / limit),
+        },
+      };
+    }
+  } catch (error) {
+    throw new Error(
+      "Error fetchin cars in getCarsByFilters server-action ->",
+      error.message
+    );
+  }
+}
+
+export async function toggleSavedCars(carId) {
+  try {
+    const user = getAuthenticatedUser();
+
+    if (!user) throw new Error("User not found");
+
+    // check if car exits
+    const car = await db.Car.findUnique({ where: { id: carId } });
+    if (!car) {
+      return {
+        succes: false,
+        error: "Car not found",
+      };
+    }
+
+    // check if car  is already saved
+    const existingCar = await db.UserSavedCar.findUnique({
+      where: {
+        userId_carId: {
+          userId: user.id,
+          carId,
+        },
+      },
+    });
+
+    // if   car is already saved ,then remove the car
+    if (existingCar) {
+      await db.UserSavedCar.delete({
+        where: {
+          userId_carId: {
+            userId: user.id,
+            carId,
+          },
+        },
+      });
+      revalidatePath(`/saved-cars`);
+      return {
+        success: true,
+        saved: false,
+        message: "Car removed from favorites",
+      };
+    }
+
+    // if car is not saved ,then save the car
+    await db.UserSavedCar.create({
+      data: {
+        userId: user.id,
+        carId,
+      },
+    });
+    revalidatePath(`/saved-cars`);
+    return {
+      success: true,
+      saved: true,
+      message: "Car added to favorite",
+    };
+  } catch (error) {
+    throw new Error("Error toggling saved cars : " + error.message);
+  }
 }
