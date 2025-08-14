@@ -5,14 +5,20 @@ import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { Filter, Sliders, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import CarFiltersControl from "./CarFiltersControl";
 
@@ -22,17 +28,17 @@ const CarFilters = ({ filters }) => {
   const searchParams = useSearchParams();
 
   //Get current filter values from searchParams
-  const currentMake = searchParmas.get("make") || "";
-  const currentBodyType = searchParmas.get("bodyType") || "";
-  const currentFuelType = searchParmas.get("fuelType") || "";
-  const currentTransmission = searchParmas.get("transmission") || "";
-  const currentMinPrice = searchParmas.get("minPrice")
-    ? parseInt(searchParmas.get("minPrice"))
+  const currentMake = searchParams.get("make") || "";
+  const currentBodyType = searchParams.get("bodyType") || "";
+  const currentFuelType = searchParams.get("fuelType") || "";
+  const currentTransmission = searchParams.get("transmission") || "";
+  const currentMinPrice = searchParams.get("minPrice")
+    ? parseInt(searchParams.get("minPrice"))
     : filters?.data.priceRange.min;
-  const currentMaxPrice = searchParmas.get("maxPrice")
-    ? parseInt(searchParmas.get("maxPrice"))
+  const currentMaxPrice = searchParams.get("maxPrice")
+    ? parseInt(searchParams.get("maxPrice"))
     : filters?.data.priceRange.max;
-  const currentSortBy = searchParmas.get("sortBy") || "newest";
+  const currentSortBy = searchParams.get("sortBy") || "newest";
 
   // Local state for filters
   const [make, setMake] = useState(currentMake);
@@ -157,7 +163,7 @@ const CarFilters = ({ filters }) => {
   };
 
   return (
-    <>
+    <div className="flex lg:flex-col justify-between gap-4">
       {/* mobile view */}
       <div className="lg:hidden mb-4">
         <div className="flex items-center">
@@ -210,7 +216,67 @@ const CarFilters = ({ filters }) => {
       </div>
 
       {/* sort seletion */}
-    </>
+      <Select
+        value={sortBy}
+        onValueChange={(value) => {
+          setSortBy(value);
+        }}
+      >
+        <SelectTrigger className="w-[180px] lg:w-full ">
+          <SelectValue placeholder="Sort By" />
+        </SelectTrigger>
+        <SelectContent>
+          {[
+            { value: "newest", label: "Newest First" },
+            { value: "priceAsc", label: "Price: Low to High" },
+            { value: "priceDesc", label: "Price: High to Low" },
+          ].map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Desktop Filters */}
+      <div className="hidden lg:block sticky top-24">
+        <div className="border rounded-lg overflow-hidden bg-white">
+          {/* Sliders */}
+          <div className="p-4 border-b border-bg-gray-50 flex justify-between items-center">
+            <h3 className="font-medium flex items-center">
+              <Sliders className="mr-2 h-4 w-4" />
+              {activeFilterCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  classname="h-8 text-sm text-gray-600"
+                  onClick={clearAllfiltersFilters}
+                >
+                  <X className="mr-1 h-3 w-3" />
+                  Clear All
+                </Button>
+              )}
+            </h3>
+          </div>
+
+          {/* Car filters control */}
+          <div className="py-6">
+            <CarFiltersControl
+              filters={filters}
+              currentFilters={currentFilters}
+              onFilterChange={handleFilterChange}
+              onClearFilter={handleClearFilter}
+            />
+          </div>
+
+          <div className="px-4 py-4 border-t">
+            <Button onClick={applyFilters} className="w-full">
+              Apply Filters
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
