@@ -121,7 +121,10 @@ const CarFilters = ({ filters }) => {
     setBodyType("");
     setFuelType("");
     setTransmission("");
-    setPriceRange([filters.priceRange.data.min, filters.priceRange.data.max]);
+    setPriceRange([
+      filters.data.priceRange.data.min,
+      filters.data.priceRange.data.max,
+    ]);
     setSortBy("newest");
 
     const params = new URLSearchParams();
@@ -161,7 +164,6 @@ const CarFilters = ({ filters }) => {
     router.push(url);
     setIsSheetOpen(false);
   };
-
   return (
     <div className="flex lg:flex-col justify-between gap-4">
       {/* mobile view */}
@@ -207,7 +209,7 @@ const CarFilters = ({ filters }) => {
                   Reset
                 </Button>
                 <Button type="button" onClick={applyFilters} className="flex-1">
-                  Show Results
+                  Apply Filters
                 </Button>
               </SheetFooter>
             </SheetContent>
@@ -250,7 +252,7 @@ const CarFilters = ({ filters }) => {
                   variant="ghost"
                   size="sm"
                   classname="h-8 text-sm text-gray-600"
-                  onClick={clearAllfiltersFilters}
+                  onClick={clearAllfilters}
                 >
                   <X className="mr-1 h-3 w-3" />
                   Clear All
