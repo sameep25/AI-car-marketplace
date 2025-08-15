@@ -52,6 +52,7 @@ export async function getCarFilters() {
       data: {
         makes: makes.map((item) => item.make),
         bodyTypes: bodyTypes.map((item) => item.bodyType),
+        fuelTypes: fuelTypes.map((item) => item.fuelType),
         transmissions: transmissions.map((item) => item.transmission),
         priceRange: {
           min: priceAggregations._min.price
