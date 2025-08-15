@@ -10,7 +10,6 @@ export const metaData = {
 
 const CarsPage = async () => {
   const filtersData = await getCarFilters();
-  // console.log(filtersData);
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-6xl mb-4 gradient-title">Browse Cars</h1>
