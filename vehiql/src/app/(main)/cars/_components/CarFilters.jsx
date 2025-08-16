@@ -251,7 +251,7 @@ const CarFilters = ({ filters }) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  classname="h-8 text-sm text-gray-600"
+                  className="h-8 text-sm text-gray-600"
                   onClick={clearAllfilters}
                 >
                   <X className="mr-1 h-3 w-3" />
