@@ -17,7 +17,7 @@ const CarCard = ({ car }) => {
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg trasition group py-0">
+    <Card className="overflow-hidden hover:shadow-xl trasition group py-0 shadow-lg bg-[#f8f8f8]">
       {/* Car image */}
       <div className="relative h-48">
         {car.images && car.images.length > 0 ? (
