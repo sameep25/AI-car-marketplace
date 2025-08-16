@@ -145,7 +145,7 @@ export async function getCarsByFilters({
 
     let wishlisted = new Set(); //create a set so cars are not repeated
     if (user) {
-      const savedCars = await db.UserSavedCars.findMany({
+      const savedCars = await db.UserSavedCar.findMany({
         where: { userId: user.id },
         select: { carId: true },
       });
@@ -153,24 +153,23 @@ export async function getCarsByFilters({
       wishlisted = new Set(savedCars.map((saved) => saved.carId));
 
       const serializedCars = cars.map((car) => {
-        serializedCarsData(car, wishlisted.has(car.id));
+        return serializedCarsData(car, wishlisted.has(car.id));
       });
 
       return {
         success: true,
         data: serializedCars,
         pagination: {
-          total: totalCars,
+          total: totalCarsCount,
           page,
           limit,
-          pages: Math.ceil(totalCars / limit),
+          pages: Math.ceil(totalCarsCount / limit),
         },
       };
     }
   } catch (error) {
     throw new Error(
-      "Error fetchin cars in getCarsByFilters server-action ->",
-      error.message
+      "Error fetchin cars in getCarsByFilters server-action ->" + error.message
     );
   }
 }
