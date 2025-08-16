@@ -234,3 +234,35 @@ export async function toggleSavedCars(carId) {
     throw new Error("Error toggling saved cars : " + error.message);
   }
 }
+
+export async function getSavedCars() {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user)
+      return {
+        success: false,
+        message: "User not found",
+      };
+
+    const savedCars = await db.UserSavedCar.findMany({
+      where: { userId: user.id },
+      include: { car: true },
+      orderBy: { savedAt: "desc" },
+    });
+
+    const serializedSavedCars = savedCars.map((savedCar) =>
+      serializedCarsData(savedCar.car)
+    );
+
+    return {
+      success: true,
+      data: serializedSavedCars,
+    };
+  } catch (error) {
+    console.error("Error fecting saved cars : " + error.message);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
