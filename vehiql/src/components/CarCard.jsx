@@ -89,6 +89,7 @@ const CarCard = ({ car }) => {
           )}
         </Button>
       </div>
+
       {/* Card content */}
       <CardContent className="p-4">
         <div className="flex flex-col mb-2">
