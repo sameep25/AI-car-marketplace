@@ -84,7 +84,7 @@ export async function getCarsByFilters({
   limit = 6,
 }) {
   try {
-    const user = getAuthenticatedUser();
+    const user = await getAuthenticatedUser();
 
     // Build where conditions
     let where = {
@@ -176,7 +176,7 @@ export async function getCarsByFilters({
 
 export async function toggleSavedCars(carId) {
   try {
-    const user = getAuthenticatedUser();
+    const user = await getAuthenticatedUser();
 
     if (!user) throw new Error("User not found");
 
