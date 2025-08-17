@@ -205,8 +205,8 @@ const CarDetails = ({ car, testDriveInfo }) => {
           </div>
 
           <Dialog>
-            <DialogTrigger className="w-full text-start">
-              <Card className="pt-5">
+            <DialogTrigger className="w-full text-start  ">
+              <Card className="pt-5 cursor-pointer">
                 <CardContent>
                   <div className="flex items-center gap-2 text-lg font-medium mb-2">
                     <Currency className="h-5 w-5 text-blue-600" />
@@ -227,7 +227,9 @@ const CarDetails = ({ car, testDriveInfo }) => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Vehiql Car Loan Calculator</DialogTitle>
+                <DialogTitle className="text-2xl text-gray-800">
+                  Vehiql Car Loan Calculator
+                </DialogTitle>
                 <EmiCalculator price={car.price} />
               </DialogHeader>
             </DialogContent>
