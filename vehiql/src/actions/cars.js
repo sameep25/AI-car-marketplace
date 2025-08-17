@@ -3,6 +3,7 @@
 
 "use server";
 
+import { getAuthenticatedUser } from "@/lib/getAuthenticatedUser";
 import { serializedCarsData } from "@/lib/helper";
 import { db } from "@/lib/prisma";
 import { createClient } from "@/lib/superbase";
@@ -361,6 +362,93 @@ export async function updateCarStatus(id, { status, featured }) {
     return {
       success: false,
       error: error.message,
+    };
+  }
+}
+
+// get cardetails by id (includes dealership + testdrive info)
+export async function getCarById(carId) {
+  try {
+    const car = await db.Car.find({
+      where: { id: carId },
+    });
+
+    if (!car)
+      return {
+        success: false,
+        message: "Car not found",
+      };
+
+    // Check if car is wishlisted by user
+    let isWishlisted = false;
+    if (dbUser) {
+      const savedCar = await db.UserSavedCar.findUnique({
+        where: {
+          userId_carId: {
+            userId: dbUser.id,
+            carId,
+          },
+        },
+      });
+
+      isWishlisted = !!savedCar;
+    }
+
+    // Check if user has already booked a test drive for this car
+    const existingTestDrive = await db.TestDriveBooking.findFirst({
+      where: {
+        carId,
+        userId: dbUser.id,
+        status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    let userTestDrive = null;
+
+    if (existingTestDrive) {
+      userTestDrive = {
+        id: existingTestDrive.id,
+        status: existingTestDrive.status,
+        bookingDate: existingTestDrive.bookingDate.toISOString(),
+      };
+    }
+
+    // Get dealership info for test drive availability
+    const dealership = await db.DealershipInfo.findFirst({
+      include: {
+        workingHours: true,
+      },
+    });
+
+    return {
+      success: true,
+      data: {
+        ...serializedCarsData(car, isWishlisted),
+        testDriveInfo: {
+          userTestDrive,
+          dealership: dealership
+            ? {
+                ...dealership,
+                createdAt: dealership.createdAt.toISOString(),
+                updatedAt: dealership.updatedAt.toISOString(),
+                workingHours: dealership.workingHours.map((hour) => ({
+                  ...hour,
+                  createdAt: hour.createdAt.toISOString(),
+                  updatedAt: hour.updatedAt.toISOString(),
+                })),
+              }
+            : null,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("Error while fetchin car by id " + error.message);
+    return {
+      success: false,
+      message: `Failed to fetch the Car by Id`,
     };
   }
 }
