@@ -369,7 +369,14 @@ export async function updateCarStatus(id, { status, featured }) {
 // get cardetails by id (includes dealership + testdrive info)
 export async function getCarById(carId) {
   try {
-    const car = await db.Car.find({
+    const user = await getAuthenticatedUser();
+    if (!user)
+      return {
+        success: false,
+        message: "User not found",
+      };
+
+    const car = await db.Car.findUnique({
       where: { id: carId },
     });
 
@@ -381,12 +388,12 @@ export async function getCarById(carId) {
 
     // Check if car is wishlisted by user
     let isWishlisted = false;
-    if (dbUser) {
+    if (user) {
       const savedCar = await db.UserSavedCar.findUnique({
         where: {
           userId_carId: {
-            userId: dbUser.id,
             carId,
+            userId: user.id,
           },
         },
       });
@@ -398,7 +405,7 @@ export async function getCarById(carId) {
     const existingTestDrive = await db.TestDriveBooking.findFirst({
       where: {
         carId,
-        userId: dbUser.id,
+        userId: user.id,
         status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
       },
       orderBy: {
