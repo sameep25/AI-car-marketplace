@@ -108,3 +108,61 @@ export async function getUserTestDrives() {
     };
   }
 }
+
+export async function deleteTestDrive(bookingId) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) throw new Error("User not found");
+
+    // fetch booking details
+    const booking = await db.TestDriveBooking.findUnique({
+      where: { id: bookingId },
+    });
+
+    // retunr if booking not found
+    if (!booking)
+      return {
+        success: false,
+        error: "Booking not found",
+      };
+
+    //   only admin and user who booked the test drive can delete the booking
+    if (booking.userId !== user.id || user.role !== "ADMIN")
+      return {
+        success: false,
+        error: "Unauthorised to cancel this booking",
+      };
+
+    // Check the status of the booking
+    if (booking.status === "CANCELLED" || booking.status === "COMPLETED")
+      return {
+        success: false,
+        error:
+          booking.status === "CANCELLED"
+            ? "Booking is already cancelled"
+            : "Cannot cancel a completed booking",
+      };
+
+    //   update the status of booking in db(delete booking)
+    await db.TestDriveBooking.update({
+      where: { id: bookingId },
+      data: { status: "CANCELLED" },
+    });
+
+    revalidatePath("/reservations");
+    revalidatePath("admin/test-drives");
+
+    return {
+      success: true,
+      message: "Test-Drive booking cancelled successfully",
+    };
+  } catch (error) {
+    console.error(
+      "Error while calling the deleteTestDrive server action" + deleteTestDrive
+    );
+    return {
+      success: false,
+      error: error.message || "Unable to delete the Test-Drive | Try Again!",
+    };
+  }
+}
