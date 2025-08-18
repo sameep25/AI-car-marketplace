@@ -111,7 +111,6 @@ const CarDetails = ({ car, testDriveInfo }) => {
     router.push(`/test-drive/${car.id}`);
   };
 
-  console.log(car);
   return (
     <div>
       <div className="flex flex-col lg:flex-row lg:gap-16">
@@ -188,7 +187,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
         </div>
 
         {/* Car Details */}
-        <div className="w-full lg:w-5/12">
+        <div className="w-full lg:w-5/12 sm:mt-4 lg:mt-0">
           <div className="flex items-center justify-between">
             <Badge className="mb-2">{car.bodyType}</Badge>
           </div>
@@ -301,13 +300,13 @@ const CarDetails = ({ car, testDriveInfo }) => {
       <div className="mt-12 p-6 bg-white rounded-lg shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h3 className="text-2xl font-bold mb-6">Description</h3>
+            <h3 className="text-2xl font-bold mb-4">Description</h3>
             <p className="whitespace-pre-line text-gray-700">
               {car.description}
             </p>
           </div>
           <div>
-            <h3 className="text-2xl font-bold mb-6">Features</h3>
+            <h3 className="text-2xl font-bold mb-4">Features</h3>
             <ul className="grid grid-cols-1 gap-2">
               <li className="flex items-center gap-2">
                 <span className="h-2 w-2 bg-blue-600 rounded-full"></span>
@@ -340,7 +339,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
       <div className="mt-8 p-6 bg-white rounded-lg shadow-sm">
         <h2 className="text-2xl font-bold mb-6">Specifications</h2>
         <div className="bg-gray-50 rounded-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-16">
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Make</span>
               <span className="font-medium">{car.make}</span>
