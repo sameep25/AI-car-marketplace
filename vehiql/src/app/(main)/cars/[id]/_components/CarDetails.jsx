@@ -33,6 +33,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import EmiCalculator from "./EmiCalculator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { format } from "date-fns";
 
 const CarDetails = ({ car, testDriveInfo }) => {
   const router = useRouter();

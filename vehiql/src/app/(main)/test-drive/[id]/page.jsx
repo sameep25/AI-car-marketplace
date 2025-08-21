@@ -11,7 +11,7 @@ export async function generateMetaData() {
 }
 
 const TestDrivePage = async ({ params }) => {
-  const { id } = params;
+  const { id } = await params;
   const result = await getCarById(id);
 
   if (!result.success) {

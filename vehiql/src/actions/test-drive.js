@@ -13,6 +13,7 @@ export async function bookTestDrive({
   notes,
 }) {
   try {
+    console.log(bookingDate);
     // check user exist in db
     const user = await getAuthenticatedUser();
     if (!user) throw new Error("User not found");
