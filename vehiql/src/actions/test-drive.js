@@ -72,9 +72,9 @@ export async function bookTestDrive({
 export async function getUserTestDrives() {
   try {
     const user = await getAuthenticatedUser();
-    if (!user) return;
+    if (!user) throw new Error("User not found");
 
-    const bookings = await db.TestDriveBooking({
+    const bookings = await db.TestDriveBooking.findMany({
       where: { userId: user.id },
       include: { car: true },
       orderBy: { bookingDate: "desc" },
