@@ -113,56 +113,56 @@ export async function getAdminTestDrive({ search = "", status = "" }) {
   }
 }
 
-// export async function updateTestDriveStatus({ bookingId, newStatus }) {
-//   try {
-//     const user = await getAuthenticatedUser();
-//     if (!user) throw new Error("User not found");
+export async function updateTestDriveStatus({ bookingId, newStatus }) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) throw new Error("User not found");
 
-//     if (user.role !== "ADMIN") throw new Error("Unauthoirzed access");
+    if (user.role !== "ADMIN") throw new Error("Unauthoirzed access");
 
-//     // get the booking
-//     const booking = await db.TestDriveBooking.findUnique({
-//       where: { id: bookingId },
-//     });
+    // get the booking
+    const booking = await db.TestDriveBooking.findUnique({
+      where: { id: bookingId },
+    });
 
-//     // throw error if booking is not found
-//     if (!booking) throw new Error("Booking not found");
+    // throw error if booking is not found
+    if (!booking) throw new Error("Booking not found");
 
-//     // check if the new-status is valid
-//     const validStatus = [
-//       "PENDING",
-//       "CONFIRMED",
-//       "COMPLETED",
-//       "NO_SHOW",
-//       "CANCELLED",
-//     ];
-//     if (!validStatus.includes(newStatus)) {
-//       return {
-//         success: false,
-//         error: "Invalid status",
-//       };
-//     }
+    // check if the new-status is valid
+    const validStatus = [
+      "PENDING",
+      "CONFIRMED",
+      "COMPLETED",
+      "NO_SHOW",
+      "CANCELLED",
+    ];
+    if (!validStatus.includes(newStatus)) {
+      return {
+        success: false,
+        error: "Invalid status",
+      };
+    }
 
-//     // update the status of test drive booking
-//     await db.TestDriveBooking.update({
-//       where: {id: bookingId},
-//       date : {status : newStatus},
-//     });
+    // update the status of test drive booking
+    await db.TestDriveBooking.update({
+      where: { id: bookingId },
+      date: { status: newStatus },
+    });
 
-//     revalidatePath("/admin/test-drives") ;
-//     revalidatePath("/reservations") ;
+    revalidatePath("/admin/test-drives");
+    revalidatePath("/reservations");
 
-//     return{
-//       success : true ,
-//       message : "Test Drives status is successfully updated"
-//     }
-//   } catch (error) {
-//     console.error(
-//       "Error while calling updateTestDriveStatus ->" + error.message
-//     );
-//     return {
-//       success: false,
-//       error: error.message,
-//     };
-//   }
-// }
+    return {
+      success: true,
+      message: "Test Drives status is successfully updated",
+    };
+  } catch (error) {
+    console.error(
+      "Error while calling updateTestDriveStatus ->" + error.message
+    );
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
