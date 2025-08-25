@@ -72,7 +72,7 @@ const TestDriveCard = ({
       >
         <div className="flex flex-col sm:flex-row">
           {/* Car Image - Left */}
-          <div className="sm:w-1/4 relative h-40 sm:h-auto">
+          <div className="sm:w-1/2 lg:w-1/3 relative h-40 sm:h-auto pl-4 ">
             {booking.car.images && booking.car.images.length > 0 ? (
               <div className="relative w-full h-full">
                 <Image
