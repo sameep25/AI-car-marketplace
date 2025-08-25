@@ -33,7 +33,7 @@ export async function getAdmin() {
   };
 }
 
-export async function getAdminTestDrive({ search = "", status = "" }) {
+export async function getAdminTestDrives({ search = "", status = "" }) {
   try {
     const user = await getAuthenticatedUser();
     if (!user) throw new Error("User not found");
@@ -115,6 +115,7 @@ export async function getAdminTestDrive({ search = "", status = "" }) {
 
 export async function updateTestDriveStatus({ bookingId, newStatus }) {
   try {
+    console.log(bookingId);
     const user = await getAuthenticatedUser();
     if (!user) throw new Error("User not found");
 
@@ -146,7 +147,7 @@ export async function updateTestDriveStatus({ bookingId, newStatus }) {
     // update the status of test drive booking
     await db.TestDriveBooking.update({
       where: { id: bookingId },
-      date: { status: newStatus },
+      data: { status: newStatus },
     });
 
     revalidatePath("/admin/test-drives");
