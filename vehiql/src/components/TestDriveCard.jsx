@@ -66,7 +66,7 @@ const TestDriveCard = ({
   return (
     <>
       <Card
-        className={`overflow-hidden ${
+        className={`overflow-hidden rounded-sm ${
           isPast ? "opacity-80 hover:opacity-100 transition-opacity" : ""
         }`}
       >
@@ -128,12 +128,13 @@ const TestDriveCard = ({
             <div className="p-4 border-t sm:border-t-0 sm:border-l sm:w-1/4 sm:flex sm:flex-col sm:justify-center sm:items-center sm:space-y-2">
               {/* Show notes if any */}
               {booking.notes && (
-                <div className="bg-gray-50 p-2 rounded text-sm w-full">
+                <div className="bg-gray-50 p-3 rounded-xl text-sm w-full">
                   <p className="font-medium">Notes:</p>
                   <p className="text-gray-600">{booking.notes}</p>
                 </div>
               )}
 
+              {/* View car button */}
               <Button
                 variant="outline"
                 size="sm"
@@ -148,12 +149,14 @@ const TestDriveCard = ({
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+
+              {/* Cancel button */}
               {(booking.status === "PENDING" ||
                 booking.status === "CONFIRMED") && (
                 <Button
                   variant="destructive"
                   size="sm"
-                  className="w-full"
+                  className="w-full mt-2"
                   onClick={() => setCancelDialogOpen(true)}
                   disabled={isCancelling}
                 >

@@ -50,7 +50,12 @@ const TestDriveList = () => {
     error: deleteTestDriveError,
   } = useFetch(deleteTestDrive);
 
+  // get test drives
   useEffect(() => {
+    if (statusFilter === "all") {
+      setStatusFilter("");
+      return;
+    }
     getTestDriveFn({ search, status: statusFilter });
   }, [search, statusFilter]);
 
@@ -66,7 +71,6 @@ const TestDriveList = () => {
 
   // Handle status update
   const handleUpdateStatus = async (bookingId, newStatus) => {
-    console.log(bookingId + "<--->" + newStatus);
     if (newStatus) {
       await updateTestDriveFn({ bookingId, newStatus });
     }
@@ -98,7 +102,7 @@ const TestDriveList = () => {
   }, [updateTestDriveResult, deleteTestDriveResult]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 w-full">
@@ -112,6 +116,7 @@ const TestDriveList = () => {
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="PENDING">Pending</SelectItem>
               <SelectItem value="CONFIRMED">Confirmed</SelectItem>
               <SelectItem value="COMPLETED">Completed</SelectItem>
@@ -140,7 +145,7 @@ const TestDriveList = () => {
       </div>
 
       {/* Test Drives List */}
-      <Card>
+      <Card className="rounded-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarRange className="h-5 w-5" />
