@@ -1,4 +1,6 @@
+import arcjet, { createMiddleware, detectBot, shield } from "@arcjet/next";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // protected routes
 const isProtectedRoute = createRouteMatcher([
@@ -7,7 +9,21 @@ const isProtectedRoute = createRouteMatcher([
   "/reservations(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+const aj = arcjet({
+  key: process.env.ARCJET_KEY,
+  rules: [
+    // sheild protection for content and security
+    shield({
+      mode: "LIVE",
+    }),
+    detectBot({
+      mode: "LIVE",
+      allow: ["CATEGORY:SEARCH_ENGINE"],
+    }),
+  ],
+});
+
+const clerk = clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
   // If userid is not found on a protected page ,user will return to sign in page
@@ -15,7 +31,11 @@ export default clerkMiddleware(async (auth, req) => {
     const { redirectToSignIn } = await auth();
     return redirectToSignIn();
   }
+
+  return NextResponse.next();
 });
+
+export default createMiddleware(aj, clerk);
 
 export const config = {
   matcher: [
