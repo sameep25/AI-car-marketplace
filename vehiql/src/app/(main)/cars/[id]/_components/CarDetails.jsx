@@ -39,7 +39,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
-  const [isWishlisted, setIsWishlisted] = useState(car.wishlisted);
+  const [isWishlisted, setIsWishlisted] = useState(car.wishliseted);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   //   custom fetch hook
@@ -190,7 +190,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
         {/* Car Details */}
         <div className="w-full lg:w-5/12 sm:mt-4 lg:mt-0">
           <div className="flex items-center justify-between">
-            <Badge className="mb-2">{car.bodyType}</Badge>
+            <Badge className="mb-2 mt-2 sm:mt-0">{car.bodyType}</Badge>
           </div>
 
           <h1 className="text-4xl font-bold mb-1">
