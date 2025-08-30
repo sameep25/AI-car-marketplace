@@ -10,7 +10,6 @@ import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CarCard from "@/components/CarCard";
-
 import {
   Pagination,
   PaginationContent,
@@ -20,6 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+
 const CarListings = () => {
   const searchParams = useSearchParams();
   const router = useRouter();

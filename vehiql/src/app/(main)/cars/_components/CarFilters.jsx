@@ -90,8 +90,6 @@ const CarFilters = ({ filters }) => {
     priceRangeMax: filters?.data.priceRange.max,
   };
 
-  // console.log(currentFilters);
-
   // handle filter change
   const handleFilterChange = (filterName, value) => {
     console.log(value);
@@ -125,10 +123,7 @@ const CarFilters = ({ filters }) => {
     setBodyType("");
     setFuelType("");
     setTransmission("");
-    setPriceRange([
-      filters.data.priceRange.data.min,
-      filters.data.priceRange.data.max,
-    ]);
+    setPriceRange([filters.data.priceRange.min, filters.data.priceRange.max]);
     setSortBy("newest");
 
     const params = new URLSearchParams();
