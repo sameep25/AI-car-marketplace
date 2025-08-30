@@ -63,7 +63,7 @@ export default function Home() {
         </div>
 
         {/* Featured Cars Car-card*/}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredCars?.map((car) => {
             return <CarCard key={car.id} car={car} />;
           })}
@@ -71,11 +71,11 @@ export default function Home() {
       </section>
 
       {/* Browse by makes */}
-      <section className="py-12 px-12 ">
+      <section className="py-6 px-12 ">
         {/* wrapper div */}
         <div className="container mx-auto ">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">Featured Cars</h2>
+            <h2 className="text-2xl font-bold">Featured Makes</h2>
             <Button variant="ghost" className="flex items-center" asChild>
               <Link href={`/cars`}>
                 View All <ChevronRight className="ml-1 h-4 w-4" />
@@ -90,7 +90,7 @@ export default function Home() {
             return (
               <Link
                 key={make.name}
-                href={`/car?make=${make.name}`}
+                href={`/cars?make=${make.name}`}
                 className="bg-white rounded-md shadow-xl p-4 text-center hover:shadow-2xl transition cursor-pointer border-1 "
               >
                 <div className="h-16 w-auto mx-auto mb-2 relative mb-4">
@@ -152,7 +152,7 @@ export default function Home() {
       </section>
 
       {/* browse by model */}
-      <section className="py-12 px-12 bg-blue-50">
+      <section className="py-6 px-12 ">
         {/* wrapper div */}
         <div className="container mx-auto ">
           <div className="flex justify-between items-center mb-8">

@@ -40,7 +40,7 @@ const Header = async ({ isAdminPage }) => {
           ) : (
             <SignedIn>
               <Link href="/saved-cars">
-                <Button>
+                <Button className="cursor-pointer">
                   <CarFront size={18} />
                   <span className="hidden md:inline">Saved Cars</span>
                 </Button>
@@ -49,7 +49,7 @@ const Header = async ({ isAdminPage }) => {
               {/* Reservations and Admin */}
               {isAdmin ? (
                 <Link href="/admin">
-                  <Button variant="outline">
+                  <Button variant="outline" className="cursor-pointer">
                     <Layout size={18} />
                     <span className="hidden md:inline">Admin Portal</span>
                   </Button>

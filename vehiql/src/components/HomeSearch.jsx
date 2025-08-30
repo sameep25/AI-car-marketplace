@@ -93,7 +93,7 @@ const HomeSearch = () => {
   const handleTextSubmit = (e) => {
     e.preventDefault();
     if (!serachTerm.trim()) {
-      toast.error("Please enter a search term");
+      toast.info("Please enter a search term");
       return;
     }
 
