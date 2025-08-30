@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 const CarCard = ({ car }) => {
   const router = useRouter();
-  const [isSaved, setIsSaved] = useState(car.wishlisted);
+  const [isSaved, setIsSaved] = useState(car.wishliseted);
   const { isSignedIn } = useAuth();
 
   // Use the useFetch hook
