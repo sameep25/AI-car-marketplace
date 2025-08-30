@@ -13,7 +13,7 @@ async function fileToBase64(file) {
   return buffer.toString("base64");
 }
 
-export async function getFeaturedCars(limit = 3) {
+export async function getFeaturedCars(limit = 4) {
   try {
     const cars = await db.Car.findMany({
       where: {
