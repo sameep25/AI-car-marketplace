@@ -35,6 +35,7 @@ const CarFilters = ({ filters }) => {
   const currentMinPrice = searchParams.get("minPrice")
     ? parseInt(searchParams.get("minPrice"))
     : filters?.data.priceRange.min;
+
   const currentMaxPrice = searchParams.get("maxPrice")
     ? parseInt(searchParams.get("maxPrice"))
     : filters?.data.priceRange.max;
@@ -89,8 +90,11 @@ const CarFilters = ({ filters }) => {
     priceRangeMax: filters?.data.priceRange.max,
   };
 
+  // console.log(currentFilters);
+
   // handle filter change
   const handleFilterChange = (filterName, value) => {
+    console.log(value);
     switch (filterName) {
       case "make":
         setMake(value);
@@ -128,7 +132,7 @@ const CarFilters = ({ filters }) => {
     setSortBy("newest");
 
     const params = new URLSearchParams();
-    const search = searchParmas.get("search");
+    const search = searchParams.get("search");
     if (search) params.set("search", search);
 
     const query = params.toString();
@@ -148,9 +152,10 @@ const CarFilters = ({ filters }) => {
     if (priceRange[0] > filters.data.priceRange.min) {
       params.set("minPrice", priceRange[0].toString());
     }
-    if (priceRange[1] < filters.data.priceRange.min) {
-      params.set("minPrice", priceRange[0].toString());
+    if (priceRange[1] < filters.data.priceRange.max) {
+      params.set("maxPrice", priceRange[1].toString());
     }
+    if (sortBy) params.set("sortBy", sortBy);
 
     const search = searchParams.get("search");
     const page = searchParams.get("page");
@@ -164,6 +169,7 @@ const CarFilters = ({ filters }) => {
     router.push(url);
     setIsSheetOpen(false);
   };
+
   return (
     <div className="flex lg:flex-col justify-between gap-4">
       {/* mobile view */}

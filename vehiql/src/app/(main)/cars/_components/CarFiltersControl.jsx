@@ -97,7 +97,7 @@ const CarFiltersControl = ({
             <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
               {section.options.map((option) => (
                 <Badge
-                  key={option.id}
+                  key={`${section.id}-${option.value}`}
                   variant={
                     section.currentValue === option.value
                       ? "Default"
