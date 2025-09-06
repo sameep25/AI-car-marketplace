@@ -144,16 +144,33 @@ export async function getCarsByFilters({
     });
 
     let wishlisted = new Set(); //create a set so cars are not repeated
+
+    //if user is logged in show wishlisted cars
     if (user) {
       const savedCars = await db.UserSavedCar.findMany({
         where: { userId: user.id },
         select: { carId: true },
       });
-
       wishlisted = new Set(savedCars.map((saved) => saved.carId));
-
       const serializedCars = cars.map((car) => {
         return serializedCarsData(car, wishlisted.has(car.id));
+      });
+
+      return {
+        success: true,
+        data: serializedCars,
+        pagination: {
+          total: totalCarsCount,
+          page,
+          limit,
+          pages: Math.ceil(totalCarsCount / limit),
+        },
+      };
+    }
+    // if user is not logged in then no wislisted cars
+    else {
+      const serializedCars = cars.map((car) => {
+        return serializedCarsData(car);
       });
 
       return {
@@ -244,6 +261,8 @@ export async function getSavedCars() {
         message: "User not found",
       };
 
+    console.log(user.id);
+
     const savedCars = await db.UserSavedCar.findMany({
       where: { userId: user.id },
       include: { car: true },
@@ -251,7 +270,7 @@ export async function getSavedCars() {
     });
 
     const serializedSavedCars = savedCars.map((savedCar) =>
-      serializedCarsData(savedCar.car)
+      serializedCarsData(savedCar.car, true)
     );
 
     return {

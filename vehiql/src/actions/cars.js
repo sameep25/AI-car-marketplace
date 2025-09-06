@@ -49,8 +49,8 @@ export async function processCarImageWithAI(file) {
       3. Year (approximately)
       4. Color
       5. Body type (SUV, Sedan, Hatchback, etc.)
-      6. Mileage (in KM per litre)
-      7. Fuel type (your best guess)
+      6. Mileage (your best guess in "KM per litre" and should be number in string)
+      7. Fuel type (Your best guess out of these options : Petrol,Diesel,Electric,Hybrid,Plug-in Hybrid)
       8. Transmission type (your best guess)
       9. Price (your best guess in dollars)
       9. Short Description as to be added to a car listing
@@ -61,8 +61,8 @@ export async function processCarImageWithAI(file) {
         "model": "",
         "year": 0000,
         "color": "",
-        "price": 000000,
-        "mileage": 0000,
+        "price": "",
+        "mileage": "",
         "bodyType": "",
         "fuelType": "",
         "transmission": "",
@@ -118,7 +118,7 @@ export async function processCarImageWithAI(file) {
       };
     }
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     throw new Error("Gemini API error: " + error.message);
   }
 }
@@ -181,34 +181,34 @@ export async function addCarToDB({ carData, images }) {
 
       const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`;
       imageUrls.push(publicUrl);
-
-      // Add the car to the database
-      const car = await db.car.create({
-        data: {
-          id: carId, // Use the same ID we used for the folder
-          make: carData.make,
-          model: carData.model,
-          year: carData.year,
-          price: carData.price,
-          mileage: carData.mileage,
-          color: carData.color,
-          fuelType: carData.fuelType,
-          transmission: carData.transmission,
-          bodyType: carData.bodyType,
-          seats: carData.seats,
-          description: carData.description,
-          status: carData.status,
-          featured: carData.featured,
-          images: imageUrls, // Store the array of image URLs
-        },
-      });
-
-      revalidatePath("/admin/cars");
-
-      return {
-        success: true,
-      };
     }
+
+    // Add the car to the database
+    const car = await db.car.create({
+      data: {
+        id: carId, // Use the same ID we used for the folder
+        make: carData.make,
+        model: carData.model,
+        year: carData.year,
+        price: carData.price,
+        mileage: carData.mileage,
+        color: carData.color,
+        fuelType: carData.fuelType,
+        transmission: carData.transmission,
+        bodyType: carData.bodyType,
+        seats: carData.seats,
+        description: carData.description,
+        status: carData.status,
+        featured: carData.featured,
+        images: imageUrls, // Store the array of image URLs
+      },
+    });
+
+    revalidatePath("/admin/cars");
+
+    return {
+      success: true,
+    };
   } catch (error) {
     throw new Error(`Error : ${error.message}`);
   }
@@ -370,11 +370,6 @@ export async function updateCarStatus(id, { status, featured }) {
 export async function getCarById(carId) {
   try {
     const user = await getAuthenticatedUser();
-    if (!user)
-      return {
-        success: false,
-        message: "User not found",
-      };
 
     const car = await db.Car.findUnique({
       where: { id: carId },
@@ -388,6 +383,10 @@ export async function getCarById(carId) {
 
     // Check if car is wishlisted by user
     let isWishlisted = false;
+    let userTestDrive = null;
+
+    let existingTestDrive;
+
     if (user) {
       const savedCar = await db.UserSavedCar.findUnique({
         where: {
@@ -399,21 +398,19 @@ export async function getCarById(carId) {
       });
 
       isWishlisted = !!savedCar;
+
+      // Check if user has already booked a test drive for this car
+      existingTestDrive = await db.TestDriveBooking.findFirst({
+        where: {
+          carId,
+          userId: user.id,
+          status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
     }
-
-    // Check if user has already booked a test drive for this car
-    const existingTestDrive = await db.TestDriveBooking.findFirst({
-      where: {
-        carId,
-        userId: user.id,
-        status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    let userTestDrive = null;
 
     if (existingTestDrive) {
       userTestDrive = {
@@ -450,6 +447,7 @@ export async function getCarById(carId) {
             : null,
         },
       },
+      user: user,
     };
   } catch (error) {
     console.error("Error while fetchin car by id " + error.message);

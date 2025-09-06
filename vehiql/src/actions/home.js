@@ -44,25 +44,25 @@ export async function getFeaturedCars(limit = 4) {
 
 export async function processAiImageSearch(file) {
   try {
-    // rate limitin gwith arcjet
-    const req = await request();
-    const decision = await aj.protect(req, { requested: 1 });
+    // // rate limitin gwith arcjet
+    // const req = await request();
+    // const decision = await aj.protect(req, { requested: 1 });
 
-    if (decision.isDenied()) {
-      if (decision.reason.isRateLimit()) {
-        const { remaining, reset } = decision.reason;
+    // if (decision.isDenied()) {
+    //   if (decision.reason.isRateLimit()) {
+    //     const { remaining, reset } = decision.reason;
 
-        console.error({
-          code: "RATE_LIMIT_EXCEEDEED",
-          details: {
-            remaining,
-            resetInSeconds: reset,
-          },
-        });
-        throw new Error("Too many requests. Please try again later");
-      }
-      throw new Error("Request Blocked");
-    }
+    //     console.error({
+    //       code: "RATE_LIMIT_EXCEEDEED",
+    //       details: {
+    //         remaining,
+    //         resetInSeconds: reset,
+    //       },
+    //     });
+    //     throw new Error("Too many requests. Please try again later");
+    //   }
+    //   throw new Error("Request Blocked");
+    // }
 
     //check if API key is available
     if (!process.env.GEMINI_API_KEY) {

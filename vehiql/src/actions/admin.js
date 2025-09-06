@@ -115,7 +115,6 @@ export async function getAdminTestDrives({ search = "", status = "" }) {
 
 export async function updateTestDriveStatus({ bookingId, newStatus }) {
   try {
-    console.log(bookingId);
     const user = await getAuthenticatedUser();
     if (!user) throw new Error("User not found");
 
