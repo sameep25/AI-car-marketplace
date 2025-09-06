@@ -44,9 +44,9 @@ const HomeSearch = () => {
       if (aiImageSearchData.data.make)
         params.set("make", aiImageSearchData.data.make);
       if (aiImageSearchData.data.bodyType)
-        params.set("make", aiImageSearchData.data.bodyType);
+        params.set("bofyType", aiImageSearchData.data.bodyType);
       if (aiImageSearchData.data.color)
-        params.set("make", aiImageSearchData.data.makecolor);
+        params.set("color", aiImageSearchData.data.color);
 
       router.push(`/cars?${params.toString()}`);
     }
@@ -103,7 +103,7 @@ const HomeSearch = () => {
 
   // ai image search
   const handleImageSearch = async (e) => {
-    console.log("clicked");
+    // console.log("clicked");
     e.preventDefault();
     if (!searchImage) {
       toast.error("Please upload an image first");

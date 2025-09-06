@@ -1,4 +1,4 @@
-export const serializedCarsData = (car, wishlisted = "false") => {
+export const serializedCarsData = (car, wishlisted = false) => {
   return {
     ...car,
     price: car.price ? parseFloat(car.price.toString()) : 0,

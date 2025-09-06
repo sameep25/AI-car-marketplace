@@ -36,7 +36,11 @@ const CarPage = async ({ params }) => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <CarDetails car={result.data} testDriveInfo={result.data.testDriveInfo} />
+      <CarDetails
+        car={result.data}
+        testDriveInfo={result?.data.testDriveInfo}
+        user={result?.user}
+      />
     </div>
   );
 };

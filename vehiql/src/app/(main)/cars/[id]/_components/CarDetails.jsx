@@ -35,7 +35,7 @@ import EmiCalculator from "./EmiCalculator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from "date-fns";
 
-const CarDetails = ({ car, testDriveInfo }) => {
+const CarDetails = ({ car, testDriveInfo, user }) => {
   const router = useRouter();
   const { isSignedIn } = useAuth();
 

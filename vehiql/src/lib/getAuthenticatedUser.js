@@ -15,8 +15,6 @@ export async function getAuthenticatedUser() {
     return user;
   } catch (error) {
     console.error(`Error in getAuthenticatedUser helper -> ${error.message}`);
-    return {
-      success: false,
-    };
+    return null;
   }
 }

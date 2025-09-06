@@ -114,7 +114,7 @@ const CarListings = () => {
   }
 
   const { data: cars, pagination } = carsData;
-  // console.log(cars);
+  // console.log(carsData);
 
   // No results then show
   if (cars.length === 0) {

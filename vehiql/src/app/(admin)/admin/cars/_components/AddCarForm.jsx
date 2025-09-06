@@ -195,7 +195,6 @@ const AddCarForm = () => {
   const onAiImageDrop = (acceptedFiles) => {
     // Do something with the files
     const file = acceptedFiles[0];
-
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image size must be lesser than 5MB");
       return;
@@ -270,7 +269,7 @@ const AddCarForm = () => {
       reader.onload = (e) => {
         setUploadedImages((prev) => [...prev, e.target.result]);
       };
-      if (uploadedImages.length > 0) {
+      if (uploadedImages.length > 0 && uploadedAiImage) {
         reader.readAsDataURL(uploadedAiImage);
       }
 
@@ -282,6 +281,20 @@ const AddCarForm = () => {
       setActiveTab("manual");
     }
   }, [processAiImageResult, uploadedAiImage]);
+
+  const onAiImageRemove = () => {
+    // Update form
+    setValue("make", "");
+    setValue("model", "");
+    setValue("year", "");
+    setValue("color", "");
+    setValue("bodyType", "");
+    setValue("fuelType", "");
+    setValue("price", "");
+    setValue("mileage", "");
+    setValue("transmission", "");
+    setValue("description", "");
+  };
 
   return (
     <div>
@@ -593,7 +606,7 @@ const AddCarForm = () => {
                   {uploadedImages.length > 0 && (
                     <div>
                       <h3>Uploaded {uploadedImages.length} Images </h3>
-                      <div className="grid sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 ">
+                      <div className="grid xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 ">
                         {uploadedImages.map((image, index) => {
                           return (
                             <div
@@ -676,6 +689,7 @@ const AddCarForm = () => {
                           onClick={() => {
                             setAiImagePreview(null);
                             setUploadedAiImage(null);
+                            onAiImageRemove();
                             toast.info("Image removed");
                           }}
                         >

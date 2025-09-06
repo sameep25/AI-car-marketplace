@@ -12,10 +12,14 @@ import useFetch from "../../hooks/use-fetch";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
-const CarCard = ({ car }) => {
+const CarCard = ({ car, isFeatured }) => {
   const router = useRouter();
-  const [isSaved, setIsSaved] = useState(car.wishliseted);
+  const [isSaved, setIsSaved] = useState(false);
   const { isSignedIn } = useAuth();
+
+  useEffect(() => {
+    setIsSaved(car.wishliseted);
+  }, []);
 
   // Use the useFetch hook
   const {
@@ -70,24 +74,30 @@ const CarCard = ({ car }) => {
             <CarIcon className="h-12 w-12 text-grey-400" />
           </div>
         )}
-
         {/*  Wishist button */}
-        <Button
-          onClick={handleToggleSave}
-          variant="ghost"
-          size="icon"
-          className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 ${
-            isSaved
-              ? "text-red-500 hover:text-red-600"
-              : "text-gray-500 hover:text-gray-900"
-          }  `}
-        >
-          {toggleLoading ? (
-            <Loader className="h-4 w-4 animate-spin" />
-          ) : (
-            <Heart className={isSaved ? "fill-current" : ""} />
-          )}
-        </Button>
+        {isFeatured ? (
+          <></>
+        ) : (
+          <Button
+            onClick={handleToggleSave}
+            variant="ghost"
+            size="icon"
+            className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5`}
+          >
+            {toggleLoading ? (
+              <Loader className="h-4 w-4 animate-spin" />
+            ) : (
+              <Heart
+                fill={isSaved ? "currentColor" : "none"}
+                className={`h-5 w-5 ${
+                  isSaved
+                    ? "text-red-500 hover:text-red-600"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
+              />
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Card content */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Calendar, Car, Cog, LayoutDashboard } from "lucide-react";
+import { Calendar, Car, Cog, Heart, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -11,6 +11,7 @@ const routes = [
   { label: "Cars", icon: Car, href: "/admin/cars" },
   { label: "Test Drives", icon: Calendar, href: "/admin/test-drives" },
   { label: "Settings", icon: Cog, href: "/admin/settings" },
+  { label: "Saved-Cars", icon: Heart, href: "/saved-cars" },
 ];
 
 const Sidebar = () => {

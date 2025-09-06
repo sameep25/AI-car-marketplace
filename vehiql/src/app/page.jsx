@@ -65,7 +65,7 @@ export default function Home() {
         {/* Featured Cars Car-card*/}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredCars?.map((car) => {
-            return <CarCard key={car.id} car={car} />;
+            return <CarCard key={car.id} car={car} isFeatured={true} />;
           })}
         </div>
       </section>

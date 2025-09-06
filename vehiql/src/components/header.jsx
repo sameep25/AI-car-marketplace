@@ -6,7 +6,7 @@ import { ArrowLeft, CarFront, Heart, Layout } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { checkUser } from "@/lib/checkUser";
 
-const Header = async ({ isAdminPage }) => {
+const Header = async ({ isAdminPage = false }) => {
   const user = await checkUser(); //checks if the user is presnt in db,if not creates a new user in db
   const isAdmin = user?.role === "ADMIN";
 
@@ -39,12 +39,18 @@ const Header = async ({ isAdminPage }) => {
             </Link>
           ) : (
             <SignedIn>
-              <Link href="/saved-cars">
-                <Button className="cursor-pointer">
-                  <CarFront size={18} />
-                  <span className="hidden md:inline">Saved Cars</span>
-                </Button>
-              </Link>
+              {isAdmin ? (
+                <></>
+              ) : (
+                <>
+                  <Link href="/saved-cars">
+                    <Button className="cursor-pointer">
+                      <CarFront size={18} />
+                      <span className="hidden md:inline">Saved Cars</span>
+                    </Button>
+                  </Link>
+                </>
+              )}
 
               {/* Reservations and Admin */}
               {isAdmin ? (
