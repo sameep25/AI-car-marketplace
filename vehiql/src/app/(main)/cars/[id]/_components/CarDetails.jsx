@@ -227,8 +227,9 @@ const CarDetails = ({ car, testDriveInfo, user }) => {
                     <h3>EMI Calculator</h3>
                   </div>
                   <div className="text-sm text-gray-600">
-                    Estimated Monthly Payment:{" "}
+                    Estimated Monthly Payment: Around
                     <span className="font-bold text-gray-900">
+                      {" "}
                       {formatCurrency(car.price / 60)}
                     </span>{" "}
                     for 60 months
